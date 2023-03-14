@@ -1,0 +1,29 @@
+<resources>
+    <string name="app_name">TBD App</string>
+    <!-- Strings related to login -->
+    <string name="prompt_email">Email</string>
+    <string name="prompt_password">Password</string>
+    <string name="action_sign_in">Sign in or register</string>
+    <string name="action_sign_in_short">Sign in</string>
+    <string name="welcome">"Welcome !"</string>
+    <string name="invalid_username">Not a valid username</string>
+    <string name="invalid_password">Password must be >5 characters</string>
+    <string name="login_failed">"Login failed"</string>
+    <string name="username_login_input_label">Email/Phone number</string>
+    <string name="password_input_label">Password</string>
+    <string name="login_submission_button">Login</string>
+    <string name="registration_input_display_name">Display Name</string>
+    <string name="registration_input_password">Password</string>
+    <string name="registration_input_password_confirmation">Confirm password</string>
+    <string name="registration_input_email">Email</string>
+    <string name="registration_input_phone_number">Phone number</string>
+    <string name="registration_input_age">Age</string>
+    <string name="login_page_registration_link">New? Register!</string>
+    <string name="registration_submission_button">Register</string>
+    <string name="display_name_label">Display name</string>
+    <string name="age_label">Age</string>
+    <string name="email_label">Email</string>
+    <string name="gender_label">Gender</string>
+    <string name="phone_number_label">Phone Number</string>
+    <string name="go_to_login">Login</string>
+</resources>

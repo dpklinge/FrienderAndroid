@@ -1,0 +1,319 @@
+---
+openapi: 3.0.1
+info:
+  title: TbdAppServer
+  version: 0.1-alpha
+servers:
+  - url: http://localhost:8081
+    description: Generated server url
+paths:
+  "/updateHomeLocation":
+    post:
+      tags:
+        - location-controller
+      summary: Updates a user's home location
+      operationId: updateHomeLocation
+      requestBody:
+        content:
+          application/json:
+            schema:
+              "$ref": "#/components/schemas/LocationUpdateRequest"
+        required: true
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/UserLocation"
+  "/updateCurrentLocation":
+    post:
+      tags:
+        - location-controller
+      summary: Updates a user's current location (used to search)
+      operationId: updateCurrentLocation
+      requestBody:
+        content:
+          application/json:
+            schema:
+              "$ref": "#/components/schemas/LocationUpdateRequest"
+        required: true
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/UserLocation"
+  "/register":
+    post:
+      tags:
+        - registration-controller
+      summary: Attempts to register a user with the provided information
+      operationId: registerUser
+      requestBody:
+        content:
+          application/json:
+            schema:
+              "$ref": "#/components/schemas/RegistrationInput"
+        required: true
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/RegistrationOutcome"
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/TbdAppServerError"
+  "/login":
+    post:
+      tags:
+        - login-controller
+      summary: Attempts to log in with provided username and password
+      operationId: loginUser
+      requestBody:
+        content:
+          application/json:
+            schema:
+              "$ref": "#/components/schemas/LoginPacket"
+        required: true
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/AppUser"
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/TbdAppServerError"
+  "/test":
+    get:
+      tags:
+        - login-controller
+      operationId: test
+      responses:
+        '200':
+          description: OK
+          content:
+            "*/*":
+              schema:
+                type: string
+  "/findUsers":
+    get:
+      tags:
+        - location-controller
+      summary: Get users in radius
+      operationId: findNearbyUsers
+      parameters:
+        - name: x
+          in: query
+          required: true
+          schema:
+            type: number
+            format: double
+        - name: y
+          in: query
+          required: true
+          schema:
+            type: number
+            format: double
+        - name: radius
+          in: query
+          required: true
+          schema:
+            type: integer
+            format: int32
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  "$ref": "#/components/schemas/UserWithLocation"
+components:
+  schemas:
+    Point:
+      type: object
+      properties:
+        x:
+          type: number
+          format: double
+        y:
+          type: number
+          format: double
+    UserLocation:
+      required:
+        - currentLocation
+        - homeLocation
+        - id
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        currentLocation:
+          "$ref": "#/components/schemas/Point"
+        homeLocation:
+          "$ref": "#/components/schemas/Point"
+    LocationUpdateRequest:
+      required:
+        - id
+        - location
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        location:
+          "$ref": "#/components/schemas/Point"
+    RegistrationOutcome:
+      required:
+        - didSucceed
+        - errors
+      type: object
+      properties:
+        didSucceed:
+          type: boolean
+        errors:
+          type: array
+          items:
+            "$ref": "#/components/schemas/ValidationError"
+    ValidationError:
+      required:
+        - errorCode
+        - message
+        - validationErrorType
+      type: object
+      properties:
+        message:
+          type: string
+        validationErrorType:
+          type: string
+          enum:
+            - NON_MATCHING_PASSWORDS
+            - EMAIL_ALREADY_EXISTS
+            - PHONE_NUMBER_ALREADY_EXISTS
+            - SERVER_ERROR
+        errorCode:
+          type: string
+          enum:
+            - INVALID_INPUT
+            - PASSWORD_INVALID
+            - DATABASE_ACCESS_ERROR
+            - INFORMATION_NOT_FOUND
+    TbdAppServerError:
+      required:
+        - errorCode
+        - message
+      type: object
+      properties:
+        message:
+          type: string
+        errorCode:
+          type: string
+          enum:
+            - INVALID_INPUT
+            - PASSWORD_INVALID
+            - DATABASE_ACCESS_ERROR
+            - INFORMATION_NOT_FOUND
+    RegistrationInput:
+      required:
+        - age
+        - displayName
+        - email
+        - gender
+        - password
+        - passwordConfirmation
+        - phoneNumber
+      type: object
+      properties:
+        displayName:
+          maxLength: 15
+          minLength: 2
+          type: string
+        password:
+          maxLength: 2147483647
+          minLength: 12
+          type: string
+        passwordConfirmation:
+          type: string
+        email:
+          type: string
+        phoneNumber:
+          type: string
+        gender:
+          type: string
+          enum:
+            - MALE
+            - FEMALE
+            - NONBINARY
+            - OTHER
+            - PREFER_NOT_TO_SAY
+        age:
+          maximum: 130
+          minimum: 18
+          type: integer
+          format: int32
+    AppUser:
+      required:
+        - age
+        - displayName
+        - email
+        - gender
+        - password
+        - phoneNumber
+      type: object
+      properties:
+        displayName:
+          type: string
+        password:
+          type: string
+        email:
+          type: string
+        phoneNumber:
+          type: string
+        gender:
+          type: string
+          enum:
+            - MALE
+            - FEMALE
+            - NONBINARY
+            - OTHER
+            - PREFER_NOT_TO_SAY
+        age:
+          type: integer
+          format: int32
+        id:
+          type: string
+          format: uuid
+    LoginPacket:
+      required:
+        - password
+        - username
+      type: object
+      properties:
+        username:
+          type: string
+        password:
+          type: string
+    UserWithLocation:
+      required:
+        - appUser
+        - location
+      type: object
+      properties:
+        appUser:
+          "$ref": "#/components/schemas/AppUser"
+        location:
+          "$ref": "#/components/schemas/UserLocation"

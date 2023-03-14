@@ -1,0 +1,121 @@
+import org.openapitools.generator.gradle.plugin.tasks.GenerateTask
+
+plugins {
+    id 'com.android.application'
+    id 'org.jetbrains.kotlin.android'
+    id 'kotlin-kapt'
+    id 'kotlin-parcelize'
+    id "org.openapi.generator" version "6.2.1"
+    id 'com.google.dagger.hilt.android'
+}
+android {
+    sourceSets {
+        main {
+            java.srcDirs = ["$buildDir/generated/src/main/kotlin"]
+        }
+    }
+    namespace 'com.clearintentions.app'
+    compileSdk 33
+
+    defaultConfig {
+        applicationId "com.clearintentions.app"
+        minSdk 27
+        targetSdk 33
+        versionCode 1
+        versionName "1.0"
+
+        testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
+    }
+
+    buildTypes {
+        release {
+            minifyEnabled false
+            proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
+        }
+    }
+    buildFeatures {
+        compose true
+    }
+    composeOptions {
+        kotlinCompilerExtensionVersion '1.4.0'
+    }
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_1_8
+        targetCompatibility JavaVersion.VERSION_1_8
+    }
+    kotlinOptions {
+        jvmTarget = '1.8'
+    }
+    buildFeatures {
+        viewBinding true
+    }
+}
+
+task generateBackendServer(type: GenerateTask) {
+    println "Generating backend server?"
+    generatorName = "kotlin"
+    inputSpec = "$rootDir/specs/ClearIntentionsServer.yaml".toString()
+    outputDir = "$buildDir/generated".toString()
+    apiPackage = "com.clearintentions.server"
+    packageName = "com.clearintentions.server"
+    modelPackage = "com.clearintentions.server.model"
+    id = "backendServer"
+    configOptions = [
+            dateLibrary: "java8",
+            useCoroutines: "true",
+            enumPropertyNaming: "UPPERCASE"
+    ]
+
+}
+afterEvaluate {
+    tasks.compileDebugJavaWithJavac.dependsOn(tasks.generateBackendServer)
+}
+build.dependsOn generateBackendServer
+
+
+dependencies {
+    implementation 'androidx.appcompat:appcompat:1.6.1'
+    implementation 'com.google.android.material:material:1.8.0'
+    implementation 'androidx.annotation:annotation:1.6.0'
+    implementation 'androidx.constraintlayout:constraintlayout:2.1.4'
+    implementation 'androidx.lifecycle:lifecycle-livedata-ktx:2.5.1'
+    implementation 'androidx.lifecycle:lifecycle-viewmodel-ktx:2.5.1'
+    implementation 'io.arrow-kt:arrow-core:1.1.5'
+    implementation 'com.fasterxml.jackson.core:jackson-core:2.14.1'
+    implementation 'com.fasterxml.jackson.core:jackson-databind:2.14.1'
+    implementation 'com.fasterxml.jackson.module:jackson-module-kotlin:2.14.1'
+    testImplementation 'junit:junit:4.13.2'
+    androidTestImplementation 'androidx.test.ext:junit:1.1.5'
+    androidTestImplementation 'androidx.test.espresso:espresso-core:3.5.1'
+
+    // Hilt dependency injection
+    implementation "com.google.dagger:hilt-android:2.44"
+    kapt "com.google.dagger:hilt-compiler:2.44"
+
+    //Compose dependencies
+    implementation 'androidx.core:core-ktx:1.9.0'
+    implementation 'androidx.lifecycle:lifecycle-runtime-ktx:2.5.1'
+    implementation 'androidx.activity:activity-compose:1.6.1'
+    implementation "androidx.compose.ui:ui:$compose_ui_version"
+    implementation "androidx.compose.ui:ui-tooling-preview:$compose_ui_version"
+    implementation 'androidx.compose.material:material:1.3.1'
+    androidTestImplementation "androidx.compose.ui:ui-test-junit4:$compose_ui_version"
+    debugImplementation "androidx.compose.ui:ui-tooling:$compose_ui_version"
+    debugImplementation "androidx.compose.ui:ui-test-manifest:$compose_ui_version"
+
+    //Openapi requirements
+    implementation "com.squareup.moshi:moshi-kotlin:1.13.0"
+    implementation "com.squareup.moshi:moshi-adapters:1.13.0"
+    implementation "com.squareup.okhttp3:okhttp:4.10.0"
+    testImplementation "io.kotlintest:kotlintest-runner-junit5:3.4.2"
+
+    // Google maps
+    implementation("com.google.maps.android:maps-compose:2.11.0")
+    implementation("com.google.android.gms:play-services-maps:18.1.0")
+    implementation 'com.google.android.gms:play-services-location:21.0.1'
+
+}
+
+kapt {
+    correctErrorTypes true
+}
